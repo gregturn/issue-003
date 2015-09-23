@@ -19,6 +19,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.hateoas.EntityLinks;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -32,10 +33,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class ApplicationController {
 
 	private final DocumentRepository repository;
+	private final EntityLinks entityLinks;
 
 	@Autowired
-	public ApplicationController(DocumentRepository repository) {
+	public ApplicationController(DocumentRepository repository, EntityLinks entityLinks) {
+
 		this.repository = repository;
+		this.entityLinks = entityLinks;
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/documents/search/findFoo/{info}")
@@ -44,6 +48,7 @@ public class ApplicationController {
 		Resource<Document> doc = new Resource<Document>(new Document());
 		doc.getContent().setInfo(info);
 		doc.add(linkTo(methodOn(ApplicationController.class).findFoo(info)).withSelfRel());
+		doc.add(entityLinks.linkToCollectionResource(Document.class).withRel("documents"));
 		return ResponseEntity.ok(doc);
 	}
 
