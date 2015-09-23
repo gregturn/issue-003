@@ -20,6 +20,6 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * @author Greg Turnquist
  */
-public interface DocumentRepository extends CrudRepository<Document, Long>, DocumentRepositoryCustom {
+public interface DocumentRepository extends CrudRepository<Document, Long> {
 
 }
