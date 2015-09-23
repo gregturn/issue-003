@@ -17,10 +17,15 @@ package demo;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.hateoas.EntityLinks;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.Resources;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,14 +47,30 @@ public class ApplicationController {
 		this.entityLinks = entityLinks;
 	}
 
-	@RequestMapping(method = RequestMethod.GET, value = "/documents/search/findFoo/{info}")
+	@RequestMapping(method = RequestMethod.GET, value = "/documents/search/customFinder/{info}")
 	public ResponseEntity<?> findFoo(@PathVariable String info) {
 
 		Resource<Document> doc = new Resource<Document>(new Document());
 		doc.getContent().setInfo(info);
 		doc.add(linkTo(methodOn(ApplicationController.class).findFoo(info)).withSelfRel());
 		doc.add(entityLinks.linkToCollectionResource(Document.class).withRel("documents"));
+
 		return ResponseEntity.ok(doc);
+	}
+
+	@RequestMapping(method = RequestMethod.GET, value = "/documents/search/findAll")
+	public ResponseEntity<?> findAll() {
+
+		List<Resource<Document>> docs = new ArrayList<>();
+		docs.add(new Resource<Document>(new Document("doc1"), new Link("localhost")));
+		docs.add(new Resource<Document>(new Document("doc2"), new Link("localhost")));
+
+		Resources<Resource<Document>> resources = new Resources<Resource<Document>>(docs);
+
+		resources.add(linkTo(methodOn(ApplicationController.class).findAll()).withSelfRel());
+		resources.add(entityLinks.linkToCollectionResource(Document.class).withRel("documents"));
+
+		return ResponseEntity.ok(resources);
 	}
 
 }
