@@ -15,12 +15,15 @@
  */
 package demo;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * @author Greg Turnquist
@@ -36,11 +39,12 @@ public class ApplicationController {
 	}
 
 	@RequestMapping(method = RequestMethod.GET, value = "/documents/search/findFoo/{info}")
-	@ResponseBody
-	public Document findFoo(@PathVariable String info) {
-		Document doc = new Document();
-		doc.setInfo(info);
-		return doc;
+	public ResponseEntity<?> findFoo(@PathVariable String info) {
+
+		Resource<Document> doc = new Resource<Document>(new Document());
+		doc.getContent().setInfo(info);
+		doc.add(linkTo(methodOn(ApplicationController.class).findFoo(info)).withSelfRel());
+		return ResponseEntity.ok(doc);
 	}
 
 }
